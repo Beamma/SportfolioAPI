@@ -35,5 +35,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
 /src/main/resources.mv.db
 /src/main/resources.trace.db
+/src/main/resources/.env
+
+.env
