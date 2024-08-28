@@ -35,6 +35,10 @@ public class UserService {
         return true;
     }
 
+    /**
+     * Takes a userDTO and creates a user in the database
+     * @param userDTO a DTO carrying all the register form data
+     */
     public void createUser(UserDTO userDTO) {
         User user = new User(userDTO.firstName, userDTO.lastName, userDTO.email, userDTO.hashedPassword);
         user = userRepository.save(user);
