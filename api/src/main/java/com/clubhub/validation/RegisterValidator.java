@@ -123,6 +123,9 @@ public class RegisterValidator {
         }
     }
 
+    /**
+     * Validates the email password on the register form
+     */
     private void validateEmail() {
         String field = userDTO.email;
 
