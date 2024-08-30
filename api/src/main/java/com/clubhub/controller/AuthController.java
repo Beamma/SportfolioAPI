@@ -14,7 +14,7 @@ import java.util.HashMap;
  * A Controller for handling logging in registering and logging out
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     AuthenticationValidator authenticationValidator = new AuthenticationValidator();
