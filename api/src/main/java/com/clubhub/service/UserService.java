@@ -3,7 +3,6 @@ package com.clubhub.service;
 import com.clubhub.dto.UserDTO;
 import com.clubhub.entity.User;
 import com.clubhub.repository.UserRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
