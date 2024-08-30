@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 /**
  * A Controller for handling logging in registering and logging out
  */
@@ -20,7 +22,7 @@ public class AuthController {
 
     private final UserService userService;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Constructor for class
@@ -39,6 +41,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> doLogin(@RequestBody LoginDTO loginDTO) {
+        System.out.println("POST /login");
 
         // Form Validation
 
@@ -60,14 +63,16 @@ public class AuthController {
     public ResponseEntity<?> doRegister(@RequestBody UserDTO userDTO) {
         System.out.println("POST /register");
 
+        userDTO.response = new HashMap<>();
+
         // Call Form Validation
         if (registerValidator.validateFormData(userDTO)) {
-            return ResponseEntity.status(400).body(userDTO);
+            return ResponseEntity.status(400).body(userDTO.response);
         }
 
         // Check If Email Already In Use
         if (!userService.checkEmailAvailable(userDTO)) {
-            return ResponseEntity.status(400).body(userDTO);
+            return ResponseEntity.status(400).body(userDTO.response);
         }
 
         // Hash Password
@@ -77,7 +82,7 @@ public class AuthController {
         userService.createUser(userDTO);
 
         // Handle Response
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(userDTO.response);
     }
 
     @DeleteMapping("/logout")

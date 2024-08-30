@@ -47,7 +47,7 @@ public class RegisterValidator {
         // Check email
         validateEmail();
 
-        return userDTO.errors;
+        return !userDTO.response.isEmpty();
     }
 
     /**
@@ -59,8 +59,7 @@ public class RegisterValidator {
         String error =  validateNameFields(field, ERROR_FIRST_NAME_NULL_FIELD, ERROR_FIRST_NAME_TOO_LONG, ERROR_FIRST_NAME_NON_ALPHA);
 
         if (error != null) {
-            userDTO.firstNameError = error;
-            userDTO.errors = true;
+            userDTO.response.put("firstNameError", error);
         }
     }
 
@@ -73,8 +72,7 @@ public class RegisterValidator {
         String error = validateNameFields(field, ERROR_LAST_NAME_NULL_FIELD, ERROR_LAST_NAME_TOO_LONG, ERROR_LAST_NAME_NON_ALPHA);
 
         if (error != null) {
-            userDTO.lastNameError = error;
-            userDTO.errors = true;
+            userDTO.response.put("lastNameError", error);
         }
     }
 
@@ -107,20 +105,21 @@ public class RegisterValidator {
      */
     private void validatePassword() {
         String field = userDTO.password;
+        String error;
 
         if (field == null) {
-            userDTO.passwordError = ERROR_PASSWORD_NULL_FIELD;
-            userDTO.errors = true;
+            error = ERROR_PASSWORD_NULL_FIELD;
         } else if (field.isEmpty() || field.trim().isEmpty()) {
-            userDTO.passwordError = ERROR_PASSWORD_NULL_FIELD;
-            userDTO.errors = true;
+            error = ERROR_PASSWORD_NULL_FIELD;
         } else if (field.length() > 32) {
-            userDTO.passwordError = ERROR_PASSWORD_TOO_LONG;
-            userDTO.errors = true;
+            error = ERROR_PASSWORD_TOO_LONG;
         } else if (field.length() < 8) {
-            userDTO.passwordError = ERROR_PASSWORD_TOO_SHORT;
-            userDTO.errors = true;
+            error = ERROR_PASSWORD_TOO_SHORT;
+        } else {
+            return;
         }
+
+        userDTO.response.put("passwordError", error);
     }
 
     /**
@@ -128,16 +127,18 @@ public class RegisterValidator {
      */
     private void validateEmail() {
         String field = userDTO.email;
+        String error;
 
         if (field == null) {
-            userDTO.emailError = ERROR_EMAIL_NULL_FIELD;
-            userDTO.errors = true;
+            error = ERROR_EMAIL_NULL_FIELD;
         } else if (field.isEmpty() || field.trim().isEmpty()) {
-            userDTO.emailError = ERROR_EMAIL_NULL_FIELD;
-            userDTO.errors = true;
+            error = ERROR_EMAIL_NULL_FIELD;
         } else if (!field.matches("^[a-zA-Z0-9][a-zA-Z0-9._%+-]*@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)+$")) {
-            userDTO.emailError = ERROR_EMAIL_INVALID_FORMAT;
-            userDTO.errors = true;
+            error = ERROR_EMAIL_INVALID_FORMAT;
+        } else {
+            return;
         }
+
+        userDTO.response.put("error", error);
     }
 }

@@ -30,8 +30,7 @@ public class UserService {
             return true;
         }
 
-        userDTO.errors = true;
-        userDTO.emailError = ERROR_EMAIL_IN_USE;
+        userDTO.response.put("emailError", ERROR_EMAIL_IN_USE);
 
         return false;
     }
@@ -42,9 +41,7 @@ public class UserService {
      */
     public void createUser(UserDTO userDTO) {
         User user = new User(userDTO.firstName, userDTO.lastName, userDTO.email, userDTO.hashedPassword);
-        user = userRepository.save(user);
-
-        userDTO.id = user.getId();
+        userRepository.save(user);
     }
 
 }

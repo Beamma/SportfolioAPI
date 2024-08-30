@@ -1,19 +1,13 @@
 package com.clubhub.dto;
 
-public class UserDTO {
+import java.util.Map;
 
-    public Long id;
+public class UserDTO {
 
     public String firstName;
     public String lastName;
     public String email;
     public String password;
     public String hashedPassword;
-
-    public Boolean errors = false;
-    public String firstNameError;
-    public String lastNameError;
-    public String emailError;
-    public String passwordError;
-
+    public Map<String, Object> response;
 }
