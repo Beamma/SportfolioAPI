@@ -57,6 +57,9 @@ public class AuthController {
         // Generate Token
         userDTO.response.put("token", jwtUtil.generateToken(userDTO.email));
 
+        // Response with user so front end knows what to set user as.
+        userDTO.response.put("user", userDTO.email);
+
         // Response
         return ResponseEntity.ok(userDTO.response);
     }
