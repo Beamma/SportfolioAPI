@@ -5,7 +5,7 @@ import com.clubhub.dto.UserDTO;
 /**
  * Used for validating the form data from register form
  */
-public class RegisterValidator {
+public class AuthenticationValidator {
 
     public static final String ERROR_FIRST_NAME_NULL_FIELD = "Please Provide A First Name";
     public static final String ERROR_FIRST_NAME_TOO_LONG = "First Name Must Be Less Than 16 Characters";
@@ -21,17 +21,17 @@ public class RegisterValidator {
 
     private UserDTO userDTO;
 
-    public RegisterValidator() {
+    public AuthenticationValidator() {
 
     }
 
     /**
-     * Calls all validation methods
+     * Calls all validation methods for a register form
      *
      * @param userDTO the object that carry's all the form data
      * @return if any errors occurred
      */
-    public Boolean validateFormData(UserDTO userDTO) {
+    public Boolean validateRegisterData(UserDTO userDTO) {
 
         this.userDTO = userDTO;
 
@@ -40,6 +40,25 @@ public class RegisterValidator {
 
         // Check lastName
         validateLastName();
+
+        // Check password
+        validatePassword();
+
+        // Check email
+        validateEmail();
+
+        return !userDTO.response.isEmpty();
+    }
+
+    /**
+     * Calls all validation methods for a login form
+     *
+     * @param userDTO the object that carry's all the form data
+     * @return if any errors occurred
+     */
+    public Boolean validateLoginData(UserDTO userDTO) {
+
+        this.userDTO = userDTO;
 
         // Check password
         validatePassword();

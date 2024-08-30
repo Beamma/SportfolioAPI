@@ -1,12 +1,11 @@
 package com.clubhub.controller;
 
-import com.clubhub.dto.LoginDTO;
 import com.clubhub.dto.UserDTO;
+import com.clubhub.security.JwtUtil;
 import com.clubhub.service.UserService;
-import com.clubhub.validation.RegisterValidator;
+import com.clubhub.validation.AuthenticationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,40 +17,48 @@ import java.util.HashMap;
 @RequestMapping("/api")
 public class AuthController {
 
-    RegisterValidator registerValidator = new RegisterValidator();
+    AuthenticationValidator authenticationValidator = new AuthenticationValidator();
 
     private final UserService userService;
 
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     /**
      * Constructor for class
      * This is where all Auto wired dependencies go
      */
     @Autowired
-    public AuthController(UserService userService, PasswordEncoder passwordEncoder) {
+    public AuthController(UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     /**
      * Login User Endpoint
-     * @param loginDTO carries the JSON from front-end to end-point
+     * @param userDTO carries the JSON from front-end to end-point
      * @return a ResponseEntity(JSON) with the result of the login
      */
     @PostMapping("/login")
-    public ResponseEntity<?> doLogin(@RequestBody LoginDTO loginDTO) {
+    public ResponseEntity<?> doLogin(@RequestBody UserDTO userDTO) {
         System.out.println("POST /login");
 
+        userDTO.response = new HashMap<>();
+
         // Form Validation
+        if (authenticationValidator.validateLoginData(userDTO)) {
+            return ResponseEntity.status(400).body(userDTO.response);
+        }
 
         // Check If Login Valid
+        if (!userService.checkPassword(userDTO)) {
+            return ResponseEntity.status(401).body(userDTO.response);
+        }
 
         // Generate Token
+        userDTO.response.put("token", jwtUtil.generateToken(userDTO.email));
 
         // Response
-
-        return ResponseEntity.ok(loginDTO);
+        return ResponseEntity.ok(userDTO.response);
     }
 
     /**
@@ -66,7 +73,7 @@ public class AuthController {
         userDTO.response = new HashMap<>();
 
         // Call Form Validation
-        if (registerValidator.validateFormData(userDTO)) {
+        if (authenticationValidator.validateRegisterData(userDTO)) {
             return ResponseEntity.status(400).body(userDTO.response);
         }
 
@@ -76,7 +83,7 @@ public class AuthController {
         }
 
         // Hash Password
-        userDTO.hashedPassword = passwordEncoder.encode(userDTO.password);
+        userService.encryptPassword(userDTO);
 
         // Register User
         userService.createUser(userDTO);

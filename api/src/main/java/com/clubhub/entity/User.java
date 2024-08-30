@@ -38,8 +38,10 @@ public class User {
 
     }
 
-    public Long getId() {
-        return this.id;
+    public String getPassword() {
+        return this.password;
     }
+
+
 
 }
