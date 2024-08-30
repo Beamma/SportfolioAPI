@@ -1,10 +1,12 @@
 package com.clubhub.controller;
 
+import com.clubhub.dto.LoginDTO;
 import com.clubhub.dto.UserDTO;
 import com.clubhub.service.UserService;
 import com.clubhub.validation.RegisterValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -18,30 +20,42 @@ public class AuthController {
 
     private final UserService userService;
 
+    private PasswordEncoder passwordEncoder;
+
     /**
      * Constructor for class
      * This is where all Auto wired dependencies go
      */
     @Autowired
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @GetMapping("/login")
-    public String getLogin() {
-        return "Login Page";
-    }
-
+    /**
+     * Login User Endpoint
+     * @param loginDTO carries the JSON from front-end to end-point
+     * @return a ResponseEntity(JSON) with the result of the login
+     */
     @PostMapping("/login")
-    public String doLogin() {
-        return "Successfully logged user in";
+    public ResponseEntity<?> doLogin(@RequestBody LoginDTO loginDTO) {
+
+        // Form Validation
+
+        // Check If Login Valid
+
+        // Generate Token
+
+        // Response
+
+        return ResponseEntity.ok(loginDTO);
     }
 
-    @GetMapping("/register")
-    public String getRegister() {
-        return "Register Page";
-    }
-
+    /**
+     * Register User Endpoint
+     * @param userDTO carries the JSON from front-end to end-point
+     * @return a ResponseEntity(JSON) with the result of the registration
+     */
     @PostMapping("/register")
     public ResponseEntity<?> doRegister(@RequestBody UserDTO userDTO) {
         System.out.println("POST /register");
@@ -52,12 +66,12 @@ public class AuthController {
         }
 
         // Check If Email Already In Use
-        if (userService.checkEmailAvailable(userDTO)) {
+        if (!userService.checkEmailAvailable(userDTO)) {
             return ResponseEntity.status(400).body(userDTO);
         }
 
         // Hash Password
-        userDTO.hashedPassword = "HASHED_PASSWORD"; //TODO Actually hash the password
+        userDTO.hashedPassword = passwordEncoder.encode(userDTO.password);
 
         // Register User
         userService.createUser(userDTO);

@@ -27,12 +27,13 @@ public class UserService {
      */
     public Boolean checkEmailAvailable(UserDTO userDTO) {
         if (userRepository.findByEmail(userDTO.email) == null) {
-            userDTO.errors = true;
-            userDTO.emailError = ERROR_EMAIL_IN_USE;
-            return false;
+            return true;
         }
 
-        return true;
+        userDTO.errors = true;
+        userDTO.emailError = ERROR_EMAIL_IN_USE;
+
+        return false;
     }
 
     /**
