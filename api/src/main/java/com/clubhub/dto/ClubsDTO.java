@@ -11,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ClubsDTO {
 
-    private List<Club> allClubs;
+    private List<Club> filteredClubs;
 
-    private Page<Club> clubsPage;
+    private Page<Club> clubsPaginated;
 
     private List<String> unionsQuery;
     private String searchQuery;

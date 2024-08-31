@@ -31,12 +31,15 @@ public class ClubController {
 
         // Validate Request
 
+
         // Get all clubs that match filter
-        clubService.getFilteredClubs(clubsDTO);
+        clubService.getListFilteredClubs(clubsDTO);
+
+        //  Get all clubs paginated, with unions
+        clubService.getPaginatedClubsWithUnions(clubsDTO);
 
         // Return Response
-
-        return ResponseEntity.ok(clubsDTO.getClubsPage().getContent());
+        return ResponseEntity.ok(clubsDTO.getClubsPaginated());
     }
 
 }

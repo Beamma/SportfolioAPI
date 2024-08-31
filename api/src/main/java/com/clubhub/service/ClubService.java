@@ -4,7 +4,6 @@ import com.clubhub.dto.ClubsDTO;
 import com.clubhub.entity.Club;
 import com.clubhub.repository.ClubRepository;
 import com.clubhub.specifications.ClubSpecifications;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,22 +24,27 @@ public class ClubService {
         this.clubRepository = clubRepository;
     }
 
+
     /**
-     * Get all clubs in the Club entity
-     * @param clubsDto a dto to carry data throughout the classes
+     * Applies the filter and get a List of clubs
+     * @param clubsDTO a DTO, that holds information on
+     * searchQuery, unionsQuery
      */
-    public void getAllClubs(ClubsDTO clubsDto) {
-        clubsDto.setAllClubs(clubRepository.findAll());
+    public void getListFilteredClubs(ClubsDTO clubsDTO) {
+        Specification<Club> spec = ClubSpecifications.filterClubs(clubsDTO.getSearchQuery(), clubsDTO.getUnionsQuery());
+        clubsDTO.setFilteredClubs(clubRepository.findAll(spec));
     }
 
     /**
-     * Applies the filter and get a Page of clubs
+     * Used to get a Paginated list of clubs that have already been filtered
      * @param clubsDTO a DTO, that holds information on
-     * searchQuery, unionsQuery, page, and pageSize
+     * list of filtered clubs, pageSize and page
      */
-    public void getFilteredClubs(ClubsDTO clubsDTO) {
-        Specification<Club> spec = ClubSpecifications.filterClubs(clubsDTO.getSearchQuery(), clubsDTO.getUnionsQuery());
+    public void getPaginatedClubsWithUnions(ClubsDTO clubsDTO) {
+        List<Long> clubIds = clubsDTO.getFilteredClubs().stream()
+                .map(Club::getId)
+                .toList();
         Pageable pageable = PageRequest.of(clubsDTO.getPage(), clubsDTO.getPageSize());
-        clubsDTO.setClubsPage(clubRepository.findAll(spec, pageable));
+        clubsDTO.setClubsPaginated(clubRepository.findByIdIn(clubIds, pageable));
     }
 }
