@@ -6,6 +6,9 @@ import com.clubhub.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service layer for all things related to the user entity
+ */
 @Service
 public class UserService {
 

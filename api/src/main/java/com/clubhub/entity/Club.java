@@ -21,7 +21,7 @@ public class Club {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany(mappedBy = "clubs")
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "clubs")
     private Set<Union> unions;
 
 }

@@ -1,7 +1,18 @@
 package com.clubhub.repository;
 
 import com.clubhub.entity.Club;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
-public interface ClubRepository extends JpaRepository<Club, Long> {
+@Repository
+public interface ClubRepository extends JpaRepository<Club, Long>, JpaSpecificationExecutor<Club> {
+
+    @EntityGraph(attributePaths = {"unions"})
+    @Override
+    Page<Club> findAll(Specification<Club> spec, Pageable pageable);
 }
