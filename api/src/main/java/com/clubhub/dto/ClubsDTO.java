@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +20,17 @@ public class ClubsDTO {
     private String searchQuery;
     private int pageSize;
     private int page;
+    private boolean error;
+    public Map<String, Object> errors;
 
 
+    public void addError (String errorName, String error) {
+        this.error = true;
+
+        errors.put(errorName, error);
+    }
+
+    public boolean getError() {
+        return this.error;
+    }
 }
