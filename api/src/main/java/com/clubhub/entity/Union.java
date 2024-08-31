@@ -1,5 +1,6 @@
 package com.clubhub.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,5 +28,6 @@ public class Union {
             name = "union_clubs",
             joinColumns = @JoinColumn(name = "union_id"),
             inverseJoinColumns = @JoinColumn(name = "club_id"))
+    @JsonIgnore
     private List<Club> clubs;
 }
