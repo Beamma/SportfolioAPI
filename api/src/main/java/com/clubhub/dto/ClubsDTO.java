@@ -21,7 +21,8 @@ public class ClubsDTO {
     private int pageSize;
     private int page;
     private boolean error;
-    public Map<String, Object> errors;
+    private Map<String, Object> errors;
+    private String orderBy;
 
 
     public void addError (String errorName, String error) {

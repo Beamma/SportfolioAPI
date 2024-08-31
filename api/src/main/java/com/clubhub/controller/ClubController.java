@@ -27,11 +27,12 @@ public class ClubController {
     public ResponseEntity<?> getFilteredClubs(@RequestParam(value = "search", required = false) String search,
                                               @RequestParam(value = "unions", required = false) List<String> unions,
                                               @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
-                                              @RequestParam(value = "page", required = false, defaultValue = "0") int page) {
+                                              @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                              @RequestParam(value = "orderBy", required = false, defaultValue = "ID_ASC") String orderBy) {
         System.out.println("GET /clubs");
 
         // Create DTO
-        ClubsDTO clubsDTO = new ClubsDTO(null, null, unions, search, pageSize, page, false, new HashMap<>());
+        ClubsDTO clubsDTO = new ClubsDTO(null, null, unions, search, pageSize, page, false, new HashMap<>(), orderBy);
 
         // Validate Request
         if (clubFilterValidation.validateClubFilterData(clubsDTO)) {

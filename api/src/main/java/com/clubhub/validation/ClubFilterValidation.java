@@ -3,6 +3,7 @@ package com.clubhub.validation;
 import com.clubhub.dto.ClubsDTO;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ public class ClubFilterValidation {
     private static final String UNION_ERROR = "Union String Contains Invalid Characters";
     private static final String PAGE_SIZE_ERROR = "Page Size Must Be Greater Than 0 and Less Than or Equal to 100";
     private static final String PAGE_ERROR = "Page Number Must Be Between 0 and 100";
+    private static final String ORDER_BY_INVALID_ERROR = "Order By Value Is Invalid";
     private ClubsDTO clubsDTO;
 
     public Boolean validateClubFilterData(ClubsDTO clubsDTO) {
@@ -28,6 +30,8 @@ public class ClubFilterValidation {
         validatePageSize();
 
         validatePage();
+
+        validateOrderBy();
 
         return clubsDTO.getError();
     }
@@ -93,6 +97,23 @@ public class ClubFilterValidation {
 
         if (page < 0 || page > 100) {
             clubsDTO.addError("pageNumberError", PAGE_ERROR);
+        }
+    }
+
+    /**
+     * Validate that the orderBy field is one of the allowed values
+     * Sets error in clubDTO
+     */
+    private void validateOrderBy() {
+        String orderBy = clubsDTO.getOrderBy();
+        List<String> validOrderByValues = Arrays.asList( // WARNING when altering here, need to reflect in service
+                "ID_ASC",
+                "NAME_ASC",
+                "NAME_DESC"
+        );
+
+        if (orderBy == null || !validOrderByValues.contains(orderBy)) {
+            clubsDTO.addError("orderByError", ORDER_BY_INVALID_ERROR);
         }
     }
 }

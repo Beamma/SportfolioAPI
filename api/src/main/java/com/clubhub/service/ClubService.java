@@ -6,6 +6,7 @@ import com.clubhub.repository.ClubRepository;
 import com.clubhub.specifications.ClubSpecifications;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -38,13 +39,35 @@ public class ClubService {
     /**
      * Used to get a Paginated list of clubs that have already been filtered
      * @param clubsDTO a DTO, that holds information on
-     * list of filtered clubs, pageSize and page
+     * list of filtered clubs, order by, pageSize and page
      */
     public void getPaginatedClubsWithUnions(ClubsDTO clubsDTO) {
         List<Long> clubIds = clubsDTO.getFilteredClubs().stream()
                 .map(Club::getId)
                 .toList();
-        Pageable pageable = PageRequest.of(clubsDTO.getPage(), clubsDTO.getPageSize());
+
+        // Get orderBy parameter from clubsDTO
+        Sort sort = getSortFromOrderBy(clubsDTO.getOrderBy());
+
+        Pageable pageable = PageRequest.of(clubsDTO.getPage(), clubsDTO.getPageSize(), sort);
         clubsDTO.setClubsPaginated(clubRepository.findByIdIn(clubIds, pageable));
+    }
+
+    /**
+     * Maps the orderBy field to a Sort object
+     * @param orderBy The orderBy field from ClubsDTO
+     * @return Sort object corresponding to the orderBy field
+     */
+    private Sort getSortFromOrderBy(String orderBy) {
+        if (orderBy == null) {
+            return Sort.unsorted(); // Default to no sorting
+        }
+
+        return switch (orderBy) { // WARNING when altering here, need to reflect in validator
+            case "ID_ASC" -> Sort.by(Sort.Order.asc("clubId")); // Adjust "clubId" to match your field name
+            case "NAME_ASC" -> Sort.by(Sort.Order.asc("name")); // Adjust "name" to match your field name
+            case "NAME_DESC" -> Sort.by(Sort.Order.desc("name")); // Adjust "name" to match your field name
+            default -> throw new IllegalArgumentException("Invalid orderBy value: " + orderBy);
+        };
     }
 }
