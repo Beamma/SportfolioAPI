@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +22,6 @@ public class Club {
     private String name;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "clubs")
-    private Set<Union> unions;
+    private List<Union> unions;
 
 }

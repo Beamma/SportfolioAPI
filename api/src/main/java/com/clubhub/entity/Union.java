@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -27,5 +27,5 @@ public class Union {
             name = "union_clubs",
             joinColumns = @JoinColumn(name = "union_id"),
             inverseJoinColumns = @JoinColumn(name = "club_id"))
-    private Set<Club> clubs;
+    private List<Club> clubs;
 }
