@@ -1,5 +1,6 @@
 package com.clubhub.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class Club {
     private String address;
 
     @OneToMany(mappedBy = "club")
+    @JsonIgnore
     private List<ClubRequests> clubRequests;
 
     @OneToMany(mappedBy = "club")

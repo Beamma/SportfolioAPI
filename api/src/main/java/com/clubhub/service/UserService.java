@@ -3,6 +3,8 @@ package com.clubhub.service;
 import com.clubhub.dto.UserDTO;
 import com.clubhub.entity.User;
 import com.clubhub.repository.UserRepository;
+import com.clubhub.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserService {
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     private static final String ERROR_EMAIL_IN_USE = "This Email Is Already In Use, Try Logging In";
 
@@ -72,6 +77,17 @@ public class UserService {
         }
 
         return true;
+    }
+
+    /**
+     * Get the user who has made the request
+     * @param token, the Authorization bearer token
+     * @return the user who is currently making the request.
+     */
+    public User getCurrentUser(String token) {
+        String userEmail = jwtUtil.extractUsername(token);
+
+        return userRepository.findByEmail(userEmail);
     }
 
 }

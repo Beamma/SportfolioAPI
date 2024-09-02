@@ -1,16 +1,19 @@
 package com.clubhub.controller;
 
 import com.clubhub.dto.ClubsDTO;
+import com.clubhub.entity.Club;
+import com.clubhub.entity.ClubRequests;
+import com.clubhub.entity.User;
 import com.clubhub.service.ClubService;
+import com.clubhub.service.UserService;
 import com.clubhub.validation.ClubFilterValidation;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -19,7 +22,11 @@ public class ClubController {
     private final ClubFilterValidation clubFilterValidation = new ClubFilterValidation();
 
     private final ClubService clubService;
-    public ClubController(ClubService clubService){
+
+    private final UserService userService;
+
+    public ClubController(ClubService clubService, UserService userService){
+        this.userService = userService;
         this.clubService = clubService;
     }
 
@@ -47,6 +54,38 @@ public class ClubController {
 
         // Return Response
         return ResponseEntity.ok(clubsDTO.getClubsPaginated());
+    }
+
+    @PostMapping("/clubs/{clubId}/join")
+    public ResponseEntity<?> requestToJoinClub(@PathVariable("clubId") Long clubId, HttpServletRequest request) {
+
+        // Get Club
+        Club club = clubService.getById(clubId);
+        if (club == null) {
+            return ResponseEntity.status(400).body("Club Does Not Exist");
+        }
+
+        // Get Authorization bearer token
+        String token = request.getHeader("Authorization").substring(7);
+
+        // Get user information
+        User user = userService.getCurrentUser(token);
+
+        // Check that the user doesn't already belong to a club
+
+        // Check that the user hasn't got any other pending requests
+
+        // Create add the entity to the database
+        ClubRequests clubRequest = clubService.addClubRequest(club, user);
+
+        // Respond with club information and status
+        Map<String, Object> response = new HashMap<>();
+        response.put("club", clubRequest.getClub());
+        response.put("status", clubRequest.getStatus());
+        response.put("date", clubRequest.getDateResponded());
+
+
+        return ResponseEntity.status(200).body(response);
     }
 
 }

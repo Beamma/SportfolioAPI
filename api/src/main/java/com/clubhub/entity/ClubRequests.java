@@ -1,9 +1,13 @@
 package com.clubhub.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+@Data
+@NoArgsConstructor
 @Entity
 public class ClubRequests {
     @Id
@@ -21,5 +25,12 @@ public class ClubRequests {
     private String status;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date date;
+    private Date dateResponded;
+
+    public ClubRequests(Club club, User user, String status, Date dateResponded) {
+        this.club = club;
+        this.user = user;
+        this.status = status;
+        this.dateResponded = dateResponded;
+    }
 }

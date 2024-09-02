@@ -1,9 +1,13 @@
 package com.clubhub.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+@Data
+@NoArgsConstructor
 @Entity
 public class ClubMembers {
     @Id
@@ -24,4 +28,11 @@ public class ClubMembers {
     private String respondedBy;
 
     private String role;
+
+    public ClubMembers(Club club, User user, String role, Date dateAccepted) {
+        this.club = club;
+        this.user = user;
+        this.role = role;
+        this.dateAccepted = dateAccepted;
+    }
 }

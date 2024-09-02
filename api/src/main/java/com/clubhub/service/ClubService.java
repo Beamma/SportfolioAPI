@@ -2,7 +2,11 @@ package com.clubhub.service;
 
 import com.clubhub.dto.ClubsDTO;
 import com.clubhub.entity.Club;
+import com.clubhub.entity.ClubRequests;
+import com.clubhub.entity.User;
+import com.clubhub.repository.ClubMemberRepository;
 import com.clubhub.repository.ClubRepository;
+import com.clubhub.repository.ClubRequestsRepository;
 import com.clubhub.specifications.ClubSpecifications;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -21,7 +26,13 @@ public class ClubService {
 
     private final ClubRepository clubRepository;
 
-    public ClubService(ClubRepository clubRepository) {
+    private final ClubMemberRepository clubMemberRepository;
+
+    private final ClubRequestsRepository clubRequestsRepository;
+
+    public ClubService(ClubRepository clubRepository, ClubMemberRepository clubMemberRepository, ClubRequestsRepository clubRequestsRepository) {
+        this.clubMemberRepository = clubMemberRepository;
+        this.clubRequestsRepository = clubRequestsRepository;
         this.clubRepository = clubRepository;
     }
 
@@ -69,5 +80,27 @@ public class ClubService {
             case "NAME_DESC" -> Sort.by(Sort.Order.desc("name")); // Adjust "name" to match your field name
             default -> throw new IllegalArgumentException("Invalid orderBy value: " + orderBy);
         };
+    }
+
+    /**
+     * Gets the club by its ID
+     * @param id, the clubs ID
+     * @return the club entity
+     */
+    public Club getById(Long id) {
+        return clubRepository.findById(id).orElse(null);
+    }
+
+    /**
+     * Given a user and club, create a request to join the club
+     * @param club the club the user is requesting to join
+     * @param user the user who is requesting to join a club
+     * @return the request entity created in the database
+     */
+    public ClubRequests addClubRequest(Club club, User user) {
+
+        ClubRequests clubRequest = new ClubRequests(club, user, "pending", new Date());
+
+        return clubRequestsRepository.save(clubRequest);
     }
 }
