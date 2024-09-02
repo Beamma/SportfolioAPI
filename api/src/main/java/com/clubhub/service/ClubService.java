@@ -2,6 +2,7 @@ package com.clubhub.service;
 
 import com.clubhub.dto.ClubsDTO;
 import com.clubhub.entity.Club;
+import com.clubhub.entity.ClubMembers;
 import com.clubhub.entity.ClubRequests;
 import com.clubhub.entity.User;
 import com.clubhub.repository.ClubMemberRepository;
@@ -102,5 +103,19 @@ public class ClubService {
         ClubRequests clubRequest = new ClubRequests(club, user, "pending", new Date());
 
         return clubRequestsRepository.save(clubRequest);
+    }
+
+    /**
+     * Get all requests by user and a given status
+     * @param status of the request
+     * @param user who requested
+     * @return any club requests that match
+     */
+    public List<ClubRequests> getClubRequestByStatusAndUser(String status, User user) {
+        return clubRequestsRepository.findByStatusAndUser(status, user.getId());
+    }
+
+    public ClubMembers getMemberByClubAndUser(Club club, User user) {
+        return clubMemberRepository.findByClubIdAndUserId(club.getId(), user.getId());
     }
 }

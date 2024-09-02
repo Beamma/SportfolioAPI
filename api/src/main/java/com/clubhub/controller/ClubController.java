@@ -58,11 +58,13 @@ public class ClubController {
 
     @PostMapping("/clubs/{clubId}/join")
     public ResponseEntity<?> requestToJoinClub(@PathVariable("clubId") Long clubId, HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
 
         // Get Club
         Club club = clubService.getById(clubId);
         if (club == null) {
-            return ResponseEntity.status(400).body("Club Does Not Exist");
+            response.put("clubError", "Club Does Not Exist");
+            return ResponseEntity.status(400).body(response);
         }
 
         // Get Authorization bearer token
@@ -72,14 +74,21 @@ public class ClubController {
         User user = userService.getCurrentUser(token);
 
         // Check that the user doesn't already belong to a club
+        if (!clubService.getClubRequestByStatusAndUser("accepted", user).isEmpty() || clubService.getMemberByClubAndUser(club, user) != null) {
+            response.put("requestError", "User Already Belongs To A Club");
+            return ResponseEntity.status(400).body(response);
+        }
 
         // Check that the user hasn't got any other pending requests
+        if (!clubService.getClubRequestByStatusAndUser("pending", user).isEmpty()) {
+            response.put("requestError", "User Already Has A Pending Request");
+            return ResponseEntity.status(400).body(response);
+        }
 
         // Create add the entity to the database
         ClubRequests clubRequest = clubService.addClubRequest(club, user);
 
         // Respond with club information and status
-        Map<String, Object> response = new HashMap<>();
         response.put("club", clubRequest.getClub());
         response.put("status", clubRequest.getStatus());
         response.put("date", clubRequest.getDateResponded());
