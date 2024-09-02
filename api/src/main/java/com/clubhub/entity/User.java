@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A user entity that stores all data
@@ -39,6 +40,12 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private List<ClubRequests> clubRequests;
+
+    @OneToOne(mappedBy = "user")
+    private ClubMembers clubMember;
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;

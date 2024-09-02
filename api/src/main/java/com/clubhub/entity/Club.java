@@ -24,4 +24,25 @@ public class Club {
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "clubs")
     private List<Union> unions;
 
+    @Column(nullable = false)
+    private String address;
+
+    @OneToMany(mappedBy = "club")
+    private List<ClubRequests> clubRequests;
+
+    @OneToMany(mappedBy = "club")
+    private List<ClubMembers> clubMembers;
+
+    // Club Badge Design
+
+    // Players
+
+    // Grades
+
+    // Est Date
+
+    // Badge
+
+    // Mascot
+
 }
