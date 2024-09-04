@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 /**
  * Service layer for all things related to the user entity
  */
@@ -90,9 +92,16 @@ public class UserService {
         return userRepository.findByEmail(userEmail);
     }
 
-    public boolean userAllowedToUpdateClubRequestStatus(String status, String token) {
+    public boolean userAllowedToUpdateClubRequestStatus(String status, String token, Long clubId) {
         User user = getCurrentUser(token);
-        String role = user.getRole();
+
+        String role = null;
+        Long userClubId = null;
+
+        if (user.getClubMember() != null) {
+            role = user.getClubMember().getRole();
+            userClubId = user.getClubMember().getClub().getId();
+        }
 
 
         // If the member doesn't yet belong to a club
@@ -101,12 +110,12 @@ public class UserService {
         }
 
         // If the user is a member of their respective club
-        if (role.equals("MEMBER")) {
+        if (role.equals("MEMBER") && userClubId.equals(clubId)) {
             return status.equals("quit");
         }
 
         // If the user is an admin of their respective club
-        if (role.equals("ADMIN")) {
+        if (role.equals("ADMIN") && userClubId.equals(clubId)) {
             return status.equals("removed") || status.equals("accepted");
         }
 

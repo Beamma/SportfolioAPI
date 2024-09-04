@@ -3,6 +3,7 @@ package com.clubhub.controller;
 import com.clubhub.dto.ClubsDTO;
 import com.clubhub.dto.UpdateClubRequestDTO;
 import com.clubhub.entity.Club;
+import com.clubhub.entity.ClubMembers;
 import com.clubhub.entity.ClubRequests;
 import com.clubhub.entity.User;
 import com.clubhub.service.ClubService;
@@ -15,12 +16,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
 public class ClubController {
 
-    private static final List<String> validRequestStatuses = List.of("accepted", "removed", "declined");
+    private static final List<String> validRequestStatuses = List.of("accepted", "removed", "declined"); //TODO Add functionality for quit
 
     private final ClubFilterValidation clubFilterValidation = new ClubFilterValidation();
 
@@ -96,6 +98,7 @@ public class ClubController {
         ClubRequests clubRequest = clubService.addClubRequest(club, user);
 
         // Respond with club information and status
+        response.put("requestId", clubRequest.getId());
         response.put("club", clubRequest.getClub());
         response.put("status", clubRequest.getStatus());
         response.put("date", clubRequest.getDateResponded());
@@ -116,7 +119,6 @@ public class ClubController {
 
         // Get Club
         Club club = clubService.getById(clubId);
-//        System.out.println(club);
 
         if (club == null) {
             response.put("clubError", "Club Does Not Exist");
@@ -134,18 +136,45 @@ public class ClubController {
         String token = request.getHeader("Authorization").substring(7);
 
         // Check users role vs permissions
-        if (!userService.userAllowedToUpdateClubRequestStatus(requestedStatus, token)) { // Change to use ClubMember Role
+        if (!userService.userAllowedToUpdateClubRequestStatus(requestedStatus, token, clubId)) { // Change to use ClubMember Role
             response.put("permissionError", "You Do Not Have Permission To Perform This Action");
             return ResponseEntity.status(403).body(response);
         }
 
-        // Check if user belongs to club
+        User user = userService.getCurrentUser(token);
 
-        // Update request
+        // If accepting a request to join club
+        if (requestedStatus.equals("accepted")) {
+            ClubMembers clubMember = clubService.acceptRequest(requestId, user);
+            if (clubMember == null) {
+                response.put("requestError", "The Request Does Not Exist");
+                return ResponseEntity.status(403).body(response);
+            }
+
+            // If successfully added member, format response
+            else {
+                response.put("memberId", clubMember.getId());
+                response.put("dateAccepted", clubMember.getDateAccepted());
+                response.put("club", clubMember.getClub().getName());
+                response.put("user", clubMember.getUser().getId());
+                return ResponseEntity.status(200).body(response);
+            }
+        }
+
+        // Otherwise
+        ClubRequests updatedClubRequest = clubService.updateClubRequest(requestId, requestedStatus);
+
+        if (updatedClubRequest == null) {
+            response.put("requestError", "The Request Does Not Exist");
+            return ResponseEntity.status(403).body(response);
+        }
 
 
-
-        return ResponseEntity.status(501).body("Not implemented");
+        response.put("requestId", updatedClubRequest.getId());
+        response.put("dateResponded", updatedClubRequest.getDateResponded());
+        response.put("club", updatedClubRequest.getClub().getName());
+        response.put("user", updatedClubRequest.getUser().getId());
+        return ResponseEntity.status(200).body(response);
     }
 
 

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -115,7 +116,45 @@ public class ClubService {
         return clubRequestsRepository.findByStatusAndUser(status, user.getId());
     }
 
+    /**
+     * Given a club and user, return a club membership entity
+     * @return return a club membership entity that matches the given club and user
+     */
     public ClubMembers getMemberByClubAndUser(Club club, User user) {
         return clubMemberRepository.findByClubIdAndUserId(club.getId(), user.getId());
+    }
+
+    public ClubMembers acceptRequest(Long requestId, User acceptingUser) {
+
+        // Attempt to update the request
+        ClubRequests request = updateClubRequest(requestId, "accepted");
+        if (request == null) {
+            return null;
+        }
+
+        // If successful, then create a new club membership identity
+        System.out.println("club: " + request.getClub().getName() +  " user: " + request.getUser().getId());
+        ClubMembers clubMembers = new ClubMembers(request.getClub(), request.getUser(), "MEMBER", new Date(), acceptingUser);
+        clubMembers = clubMemberRepository.save(clubMembers);
+
+
+        return clubMembers;
+    }
+
+
+    public ClubRequests updateClubRequest(Long requestId, String status) {
+
+
+        Optional<ClubRequests> optionalRequest = clubRequestsRepository.findById(requestId);
+
+
+        if (optionalRequest.isEmpty()) {
+            return null;
+        }
+
+        ClubRequests request = optionalRequest.get();
+        request.setStatus(status);
+        request.setDateResponded(new Date());
+        return clubRequestsRepository.save(request);
     }
 }
