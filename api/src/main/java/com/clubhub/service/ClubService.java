@@ -60,7 +60,7 @@ public class ClubService {
 
         // Get orderBy parameter from clubsDTO
         Sort sort = getSortFromOrderBy(clubsDTO.getOrderBy());
-
+        System.out.println(clubIds);
         Pageable pageable = PageRequest.of(clubsDTO.getPage(), clubsDTO.getPageSize(), sort);
         clubsDTO.setClubsPaginated(clubRepository.findByIdIn(clubIds, pageable));
     }
@@ -76,7 +76,7 @@ public class ClubService {
         }
 
         return switch (orderBy) { // WARNING when altering here, need to reflect in validator
-            case "ID_ASC" -> Sort.by(Sort.Order.asc("clubId")); // Adjust "clubId" to match your field name
+            case "ID_ASC" -> Sort.by(Sort.Order.asc("id")); // Adjust "clubId" to match your field name
             case "NAME_ASC" -> Sort.by(Sort.Order.asc("name")); // Adjust "name" to match your field name
             case "NAME_DESC" -> Sort.by(Sort.Order.desc("name")); // Adjust "name" to match your field name
             default -> throw new IllegalArgumentException("Invalid orderBy value: " + orderBy);

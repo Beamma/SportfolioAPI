@@ -61,6 +61,8 @@ public class ClubController {
 
     @PostMapping("/clubs/{clubId}/request")
     public ResponseEntity<?> requestToJoinClub(@PathVariable("clubId") Long clubId, HttpServletRequest request) {
+        System.out.println("POST /clubs/{id}/request");
+
         Map<String, Object> response = new HashMap<>();
 
         // Get Club
@@ -107,11 +109,15 @@ public class ClubController {
                                                      @PathVariable("requestId") Long requestId,
                                                      @RequestBody UpdateClubRequestDTO requestBody,
                                                      HttpServletRequest request) {
+        System.out.println("PUT /clubs/{id}/request/{id}");
+
         Map<String, Object> response = new HashMap<>();
         String requestedStatus = requestBody.status;
 
         // Get Club
         Club club = clubService.getById(clubId);
+//        System.out.println(club);
+
         if (club == null) {
             response.put("clubError", "Club Does Not Exist");
             return ResponseEntity.status(400).body(response);
@@ -128,7 +134,7 @@ public class ClubController {
         String token = request.getHeader("Authorization").substring(7);
 
         // Check users role vs permissions
-        if (!userService.userAllowedToUpdateClubRequestStatus(requestedStatus, token)) {
+        if (!userService.userAllowedToUpdateClubRequestStatus(requestedStatus, token)) { // Change to use ClubMember Role
             response.put("permissionError", "You Do Not Have Permission To Perform This Action");
             return ResponseEntity.status(403).body(response);
         }

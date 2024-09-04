@@ -33,6 +33,7 @@ public class Club {
     private List<ClubRequests> clubRequests;
 
     @OneToMany(mappedBy = "club")
+    @JsonIgnore
     private List<ClubMembers> clubMembers;
 
     // Club Badge Design
