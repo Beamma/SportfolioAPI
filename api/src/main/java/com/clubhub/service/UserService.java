@@ -90,4 +90,28 @@ public class UserService {
         return userRepository.findByEmail(userEmail);
     }
 
+    public boolean userAllowedToUpdateClubRequestStatus(String status, String token) {
+        User user = getCurrentUser(token);
+        String role = user.getRole();
+
+
+        // If the member doesn't yet belong to a club
+        if (role == null) {
+            return status.equals("canceled");
+        }
+
+        // If the user is a member of their respective club
+        if (role.equals("MEMBER")) {
+            return status.equals("quit");
+        }
+
+        // If the user is an admin of their respective club
+        if (role.equals("ADMIN")) {
+            return status.equals("removed") || status.equals("accepted");
+        }
+
+        // If the user is root, they can do anything
+        return role.equals("ROOT");
+    }
+
 }

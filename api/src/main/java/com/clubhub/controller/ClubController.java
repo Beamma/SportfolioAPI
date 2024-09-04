@@ -1,6 +1,7 @@
 package com.clubhub.controller;
 
 import com.clubhub.dto.ClubsDTO;
+import com.clubhub.dto.UpdateClubRequestDTO;
 import com.clubhub.entity.Club;
 import com.clubhub.entity.ClubRequests;
 import com.clubhub.entity.User;
@@ -18,6 +19,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class ClubController {
+
+    private static final List<String> validRequestStatuses = List.of("accepted", "removed", "declined");
 
     private final ClubFilterValidation clubFilterValidation = new ClubFilterValidation();
 
@@ -56,7 +59,7 @@ public class ClubController {
         return ResponseEntity.ok(clubsDTO.getClubsPaginated());
     }
 
-    @PostMapping("/clubs/{clubId}/join")
+    @PostMapping("/clubs/{clubId}/request")
     public ResponseEntity<?> requestToJoinClub(@PathVariable("clubId") Long clubId, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 
@@ -85,6 +88,8 @@ public class ClubController {
             return ResponseEntity.status(400).body(response);
         }
 
+        // TODO check that the user hasn't already been denied / removed from this club / left the club
+
         // Create add the entity to the database
         ClubRequests clubRequest = clubService.addClubRequest(club, user);
 
@@ -96,5 +101,46 @@ public class ClubController {
 
         return ResponseEntity.status(200).body(response);
     }
+
+    @PutMapping("/clubs/{clubId}/request/{requestId}")
+    public ResponseEntity<?> updateRequestToJoinClub(@PathVariable("clubId") Long clubId,
+                                                     @PathVariable("requestId") Long requestId,
+                                                     @RequestBody UpdateClubRequestDTO requestBody,
+                                                     HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        String requestedStatus = requestBody.status;
+
+        // Get Club
+        Club club = clubService.getById(clubId);
+        if (club == null) {
+            response.put("clubError", "Club Does Not Exist");
+            return ResponseEntity.status(400).body(response);
+        }
+
+        // Validate requestBody
+        if (!validRequestStatuses.contains(requestedStatus)) {
+            response.put("statusError", "Status String Does Not Exist");
+            return ResponseEntity.status(400).body(response);
+        }
+
+
+        // Get Authorization bearer token
+        String token = request.getHeader("Authorization").substring(7);
+
+        // Check users role vs permissions
+        if (!userService.userAllowedToUpdateClubRequestStatus(requestedStatus, token)) {
+            response.put("permissionError", "You Do Not Have Permission To Perform This Action");
+            return ResponseEntity.status(403).body(response);
+        }
+
+        // Check if user belongs to club
+
+        // Update request
+
+
+
+        return ResponseEntity.status(501).body("Not implemented");
+    }
+
 
 }

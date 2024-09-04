@@ -47,6 +47,9 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user")
     private ClubMembers clubMember;
 
+    @Column
+    private String role;
+
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
