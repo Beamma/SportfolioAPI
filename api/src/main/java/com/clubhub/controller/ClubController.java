@@ -111,7 +111,7 @@ public class ClubController {
     public ResponseEntity<?> updateRequestToJoinClub(@PathVariable("clubId") Long clubId,
                                                      @PathVariable("requestId") Long requestId,
                                                      @RequestBody UpdateClubRequestDTO requestBody,
-                                                     HttpServletRequest request) {
+                                                     HttpServletRequest request) { // TODO Refactor, to use DTOs
         System.out.println("PUT /clubs/{id}/request/{id}");
 
         Map<String, Object> response = new HashMap<>();
