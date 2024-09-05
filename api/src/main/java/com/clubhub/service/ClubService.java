@@ -124,7 +124,7 @@ public class ClubService {
         return clubMemberRepository.findByClubIdAndUserId(club.getId(), user.getId());
     }
 
-    public ClubMembers acceptRequest(Long requestId, User acceptingUser) {
+    public ClubMembers acceptRequest(Long requestId) {
 
         // Attempt to update the request
         ClubRequests request = updateClubRequest(requestId, "accepted");
@@ -132,9 +132,12 @@ public class ClubService {
             return null;
         }
 
+        if (clubMemberRepository.findByClubIdAndUserId(request.getClub().getId(), request.getUser().getId()) != null) {
+            return null;
+        }
+
         // If successful, then create a new club membership identity
-        System.out.println("club: " + request.getClub().getName() +  " user: " + request.getUser().getId());
-        ClubMembers clubMembers = new ClubMembers(request.getClub(), request.getUser(), "MEMBER", new Date(), acceptingUser);
+        ClubMembers clubMembers = new ClubMembers(request.getClub(), request.getUser(), "MEMBER", new Date());
         clubMembers = clubMemberRepository.save(clubMembers);
 
 

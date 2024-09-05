@@ -141,13 +141,11 @@ public class ClubController {
             return ResponseEntity.status(403).body(response);
         }
 
-        User user = userService.getCurrentUser(token);
-
         // If accepting a request to join club
         if (requestedStatus.equals("accepted")) {
-            ClubMembers clubMember = clubService.acceptRequest(requestId, user);
+            ClubMembers clubMember = clubService.acceptRequest(requestId);
             if (clubMember == null) {
-                response.put("requestError", "The Request Does Not Exist");
+                response.put("requestError", "There Was An Error Processing The Request. Either The Request Doesn't Exist, Or The User Is Already A Member Of The Club");
                 return ResponseEntity.status(403).body(response);
             }
 

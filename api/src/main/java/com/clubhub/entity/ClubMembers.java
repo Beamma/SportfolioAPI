@@ -25,10 +25,6 @@ public class ClubMembers {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateAccepted;
 
-    @OneToOne
-    @JoinColumn(name = "accepted_by", nullable = true)
-    private User acceptedBy;
-
     private String role;
 
     public ClubMembers(Club club, User user, String role, Date dateAccepted) {
@@ -36,13 +32,5 @@ public class ClubMembers {
         this.user = user;
         this.role = role;
         this.dateAccepted = dateAccepted;
-    }
-
-    public ClubMembers(Club club, User user, String role, Date dateAccepted, User acceptedBy) {
-        this.club = club;
-        this.user = user;
-        this.role = role;
-        this.dateAccepted = dateAccepted;
-        this.acceptedBy = acceptedBy;
     }
 }
