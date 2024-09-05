@@ -145,8 +145,8 @@ public class ClubController {
         if (requestedStatus.equals("accepted")) {
             ClubMembers clubMember = clubService.acceptRequest(requestId);
             if (clubMember == null) {
-                response.put("requestError", "There Was An Error Processing The Request. Either The Request Doesn't Exist, Or The User Is Already A Member Of The Club");
-                return ResponseEntity.status(403).body(response);
+                response.put("requestError", "There Was An Error Processing The Request.");
+                return ResponseEntity.status(400).body(response);
             }
 
             // If successfully added member, format response
@@ -156,6 +156,14 @@ public class ClubController {
                 response.put("club", clubMember.getClub().getName());
                 response.put("user", clubMember.getUser().getId());
                 return ResponseEntity.status(200).body(response);
+            }
+        }
+
+        // If removing a user from the club
+        if (requestedStatus.equals("removed")) {
+            if (clubService.denyRequest(requestId) == null) {
+                response.put("requestError", "There Was An Error Processing The Request.");
+                return ResponseEntity.status(400).body(response);
             }
         }
 

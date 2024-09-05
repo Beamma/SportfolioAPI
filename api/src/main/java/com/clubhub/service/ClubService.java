@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -124,11 +125,20 @@ public class ClubService {
         return clubMemberRepository.findByClubIdAndUserId(club.getId(), user.getId());
     }
 
+    /**
+     * Accepts a request to join a club. Updates the request status, and adds the user to the ClubMembers table
+     * @param requestId the ClubRequests id
+     * @return the new ClubMembers
+     */
     public ClubMembers acceptRequest(Long requestId) {
 
         // Attempt to update the request
         ClubRequests request = updateClubRequest(requestId, "accepted");
         if (request == null) {
+            return null;
+        }
+
+        if (!request.getStatus().equals("pending")) {
             return null;
         }
 
@@ -144,7 +154,39 @@ public class ClubService {
         return clubMembers;
     }
 
+    /**
+     * Denies a request to join a club. Updates the request status, and removes the user to the ClubMembers table
+     * @param requestId the ClubRequests id
+     * @return the updated ClubRequests
+     */
+    public ClubRequests denyRequest(Long requestId) {
+        // Attempt to update the request
+        ClubRequests request = updateClubRequest(requestId, "removed");
+        if (request == null) {
+            return null;
+        }
 
+        if (!request.getStatus().equals("accepted")) {
+            return null;
+        }
+
+        ClubMembers clubMember = clubMemberRepository.findByClubIdAndUserId(request.getClub().getId(), request.getUser().getId());
+        if (clubMember == null) {
+            return null;
+        }
+
+        clubMemberRepository.delete(clubMember);
+
+
+        return request;
+    }
+
+    /**
+     * Updates a club request, with the given status
+     * @param requestId the ClubRequests id
+     * @param status the status you wish to set the ClubRequest too
+     * @return the updated ClubRequests
+     */
     public ClubRequests updateClubRequest(Long requestId, String status) {
 
 
