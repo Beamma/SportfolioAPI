@@ -1,11 +1,11 @@
 package com.clubhub.controller;
 
+import com.clubhub.dto.ClubRequestDTO;
 import com.clubhub.dto.ClubsDTO;
 import com.clubhub.dto.UpdateClubRequestDTO;
 import com.clubhub.entity.Club;
 import com.clubhub.entity.ClubMembers;
 import com.clubhub.entity.ClubRequests;
-import com.clubhub.entity.User;
 import com.clubhub.service.ClubService;
 import com.clubhub.service.UserService;
 import com.clubhub.validation.ClubFilterValidation;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
@@ -65,46 +64,25 @@ public class ClubController {
     public ResponseEntity<?> requestToJoinClub(@PathVariable("clubId") Long clubId, HttpServletRequest request) {
         System.out.println("POST /clubs/{id}/request");
 
-        Map<String, Object> response = new HashMap<>();
+        // Construct DTO
+        ClubRequestDTO clubRequestDTO = new ClubRequestDTO();
 
         // Get Club
-        Club club = clubService.getById(clubId);
-        if (club == null) {
-            response.put("clubError", "Club Does Not Exist");
-            return ResponseEntity.status(400).body(response);
-        }
+        clubRequestDTO.setClub(clubService.getById(clubId));
 
-        // Get Authorization bearer token
+        // Get Current User
         String token = request.getHeader("Authorization").substring(7);
+        clubRequestDTO.setUser(userService.getCurrentUser(token));
 
-        // Get user information
-        User user = userService.getCurrentUser(token);
-
-        // Check that the user doesn't already belong to a club
-        if (!clubService.getClubRequestByStatusAndUser("accepted", user).isEmpty() || clubService.getMemberByClubAndUser(club, user) != null) {
-            response.put("requestError", "User Already Belongs To A Club");
-            return ResponseEntity.status(400).body(response);
+        // Validate Request
+        if (!clubService.clubRequestIsValid(clubRequestDTO)) {
+            return ResponseEntity.status(400).body(clubRequestDTO.getResponse());
         }
 
-        // Check that the user hasn't got any other pending requests
-        if (!clubService.getClubRequestByStatusAndUser("pending", user).isEmpty()) {
-            response.put("requestError", "User Already Has A Pending Request");
-            return ResponseEntity.status(400).body(response);
-        }
+        // Must be a valid request, so add it to database and add the appropriate things to the response
+        clubService.handleValidRequest(clubRequestDTO);
 
-        // TODO check that the user hasn't already been denied / removed from this club / left the club
-
-        // Create add the entity to the database
-        ClubRequests clubRequest = clubService.addClubRequest(club, user);
-
-        // Respond with club information and status
-        response.put("requestId", clubRequest.getId());
-        response.put("club", clubRequest.getClub());
-        response.put("status", clubRequest.getStatus());
-        response.put("date", clubRequest.getDateResponded());
-
-
-        return ResponseEntity.status(200).body(response);
+        return ResponseEntity.status(200).body(clubRequestDTO.getResponse());
     }
 
     @PutMapping("/clubs/{clubId}/request/{requestId}")

@@ -10,4 +10,7 @@ public interface ClubRequestsRepository extends JpaRepository<ClubRequests, Long
 
     @Query(value = "SELECT * FROM CLUB_REQUESTS WHERE USER_ID = ?2 AND STATUS = ?1", nativeQuery = true)
     List<ClubRequests> findByStatusAndUser(String status, Long userId);
+
+    @Query(value = "SELECT * FROM CLUB_REQUESTS WHERE USER_ID = ?2 AND STATUS = ?1 AND CLUB_ID =?3", nativeQuery = true)
+    List<ClubRequests> findByStatusUserAndClub(String status, Long userId, Long clubId);
 }
