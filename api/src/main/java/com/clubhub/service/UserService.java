@@ -1,5 +1,6 @@
 package com.clubhub.service;
 
+import com.clubhub.dto.ClubUpdateDTO;
 import com.clubhub.dto.UserDTO;
 import com.clubhub.entity.User;
 import com.clubhub.repository.UserRepository;
@@ -92,8 +93,8 @@ public class UserService {
         return userRepository.findByEmail(userEmail);
     }
 
-    public boolean userAllowedToUpdateClubRequestStatus(String status, String token, Long clubId) {
-        User user = getCurrentUser(token);
+    public boolean userAllowedToUpdateClubRequestStatus(ClubUpdateDTO clubUpdateDTO) {
+        User user = getCurrentUser(clubUpdateDTO.getToken());
 
         String role = null;
         Long userClubId = null;
@@ -106,17 +107,17 @@ public class UserService {
 
         // If the member doesn't yet belong to a club
         if (role == null) {
-            return status.equals("canceled");
+            return clubUpdateDTO.getRequestedStatus().equals("canceled");
         }
 
         // If the user is a member of their respective club
-        if (role.equals("MEMBER") && userClubId.equals(clubId)) {
-            return status.equals("quit");
+        if (role.equals("MEMBER") && userClubId.equals(clubUpdateDTO.getClub().getId())) {
+            return clubUpdateDTO.getRequestedStatus().equals("quit");
         }
 
         // If the user is an admin of their respective club
-        if (role.equals("ADMIN") && userClubId.equals(clubId)) {
-            return status.equals("removed") || status.equals("accepted");
+        if (role.equals("ADMIN") && userClubId.equals(clubUpdateDTO.getClub().getId())) {
+            return clubUpdateDTO.getRequestedStatus().equals("removed") || clubUpdateDTO.getRequestedStatus().equals("accepted");
         }
 
         // If the user is root, they can do anything

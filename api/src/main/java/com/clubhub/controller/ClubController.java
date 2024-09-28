@@ -1,6 +1,7 @@
 package com.clubhub.controller;
 
 import com.clubhub.dto.ClubRequestDTO;
+import com.clubhub.dto.ClubUpdateDTO;
 import com.clubhub.dto.ClubsDTO;
 import com.clubhub.dto.UpdateClubRequestDTO;
 import com.clubhub.entity.Club;
@@ -20,8 +21,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class ClubController {
-
-    private static final List<String> validRequestStatuses = List.of("accepted", "removed", "declined"); //TODO Add functionality for quit
 
     private final ClubFilterValidation clubFilterValidation = new ClubFilterValidation();
 
@@ -92,32 +91,23 @@ public class ClubController {
                                                      HttpServletRequest request) { // TODO Refactor, to use DTOs
         System.out.println("PUT /clubs/{id}/request/{id}");
 
-        Map<String, Object> response = new HashMap<>();
-        String requestedStatus = requestBody.status;
+        ClubUpdateDTO clubUpdateDTO = new ClubUpdateDTO(requestBody.status, clubService.getById(clubId), request.getHeader("Authorization").substring(7));
 
-        // Get Club
-        Club club = clubService.getById(clubId);
-
-        if (club == null) {
-            response.put("clubError", "Club Does Not Exist");
-            return ResponseEntity.status(400).body(response);
+        if (!clubService.clubUpdateIsValid(clubUpdateDTO)) {
+            return ResponseEntity.status(400).body(clubUpdateDTO.getResponse());
         }
-
-        // Validate requestBody
-        if (!validRequestStatuses.contains(requestedStatus)) {
-            response.put("statusError", "Status String Does Not Exist");
-            return ResponseEntity.status(400).body(response);
-        }
-
-
-        // Get Authorization bearer token
-        String token = request.getHeader("Authorization").substring(7);
 
         // Check users role vs permissions
-        if (!userService.userAllowedToUpdateClubRequestStatus(requestedStatus, token, clubId)) { // Change to use ClubMember Role
-            response.put("permissionError", "You Do Not Have Permission To Perform This Action");
-            return ResponseEntity.status(403).body(response);
+        if (!userService.userAllowedToUpdateClubRequestStatus(clubUpdateDTO)) { // Change to use ClubMember Role
+            clubUpdateDTO.updateResponse("permissionError", "You Do Not Have Permission To Perform This Action");
+            return ResponseEntity.status(403).body(clubUpdateDTO.getResponse());
         }
+
+        if (!clubService.handleUpdateRequest(clubUpdateDTO)) {
+            return ResponseEntity.status(400).body(clubUpdateDTO.getResponse());
+        }
+
+
 
         // If accepting a request to join club
         if (requestedStatus.equals("accepted")) {

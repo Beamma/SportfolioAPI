@@ -1,6 +1,7 @@
 package com.clubhub.service;
 
 import com.clubhub.dto.ClubRequestDTO;
+import com.clubhub.dto.ClubUpdateDTO;
 import com.clubhub.dto.ClubsDTO;
 import com.clubhub.entity.Club;
 import com.clubhub.entity.ClubMembers;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -34,6 +36,9 @@ public class ClubService {
     private static final String USER_ALREADY_DENIED_ERROR = "User Has Already Been Denied From This Club";
     private static final String USER_ALREADY_LEFT_ERROR = "User Has Already Left From This Club";
     private static final String USER_ALREADY_REMOVED_ERROR = "User Has Already Left From This Club";
+    private static final String STATUS_DOES_NOT_EXIST = "Status String Does Not Exist";
+
+    private static final List<String> validRequestStatuses = List.of("accepted", "removed", "declined"); //TODO Add functionality for quit
 
     private final ClubRepository clubRepository;
 
@@ -284,5 +289,23 @@ public class ClubService {
         clubRequestDTO.updateResponse("status", clubRequest.getStatus());
         clubRequestDTO.updateResponse("date", clubRequest.getDateResponded());
 
+    }
+
+
+    public boolean clubUpdateIsValid(ClubUpdateDTO clubUpdateDTO) {
+
+        // Check if club is null
+        if (clubUpdateDTO.getClub() == null) {
+            clubUpdateDTO.updateResponse("clubError", CLUB_ERROR);
+            return false;
+        }
+
+        // Validate requestBody
+        if (!validRequestStatuses.contains(clubUpdateDTO.getRequestedStatus())) {
+            clubUpdateDTO.updateResponse("statusError", STATUS_DOES_NOT_EXIST);
+            return false;
+        }
+
+        return true;
     }
 }
