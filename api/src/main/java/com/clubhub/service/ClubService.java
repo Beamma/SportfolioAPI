@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -292,6 +293,11 @@ public class ClubService {
     }
 
 
+    /**
+     * Check that the update request for the club is valid
+     * @param clubUpdateDTO a DTO to carry all the required information
+     * @return true if valid, false otherwise
+     */
     public boolean clubUpdateIsValid(ClubUpdateDTO clubUpdateDTO) {
 
         // Check if club is null
@@ -305,6 +311,56 @@ public class ClubService {
             clubUpdateDTO.updateResponse("statusError", STATUS_DOES_NOT_EXIST);
             return false;
         }
+
+        return true;
+    }
+
+    /**
+     * Update the club request if possible
+     * @param clubUpdateDTO a DTO to carry all the required information
+     * @return true if the request has updated, false if an error
+     */
+    public boolean handleUpdateRequest(ClubUpdateDTO clubUpdateDTO) {
+
+        if (Objects.equals(clubUpdateDTO.getRequestedStatus(), "accepted")) {
+            clubUpdateDTO.setClubMember(acceptRequest(clubUpdateDTO.getRequestId()));
+            if (clubUpdateDTO.getClubMember() == null) {
+                clubUpdateDTO.updateResponse("requestError", "There Was An Error Processing The Request.");
+                return false;
+            }
+
+            // If successfully added member, format response
+            else {
+                clubUpdateDTO.updateResponse("memberId", clubUpdateDTO.getClubMember().getId());
+                clubUpdateDTO.updateResponse("dateAccepted", clubUpdateDTO.getClubMember().getDateAccepted());
+                clubUpdateDTO.updateResponse("club", clubUpdateDTO.getClubMember().getClub().getName());
+                clubUpdateDTO.updateResponse("user", clubUpdateDTO.getClubMember().getUser().getId());
+                return true;
+            }
+        }
+
+        // If removing a user from the club
+        if (clubUpdateDTO.getRequestedStatus().equals("removed")) {
+            if (denyRequest(clubUpdateDTO.getRequestId()) == null) {
+                clubUpdateDTO.updateResponse("requestError", "There Was An Error Processing The Request.");
+                return false;
+            }
+        }
+
+        // Otherwise
+        ClubRequests clubRequest = updateClubRequest(clubUpdateDTO.getRequestId(), clubUpdateDTO.getRequestedStatus());
+        clubUpdateDTO.setClubRequests(clubRequest);
+
+        if (clubRequest == null) {
+            clubUpdateDTO.updateResponse("requestError", "The Request Does Not Exist");
+            return false;
+        }
+
+
+        clubUpdateDTO.updateResponse("requestId", clubRequest.getId());
+        clubUpdateDTO.updateResponse("dateResponded", clubRequest.getDateResponded());
+        clubUpdateDTO.updateResponse("club", clubRequest.getClub().getName());
+        clubUpdateDTO.updateResponse("user", clubRequest.getUser().getId());
 
         return true;
     }

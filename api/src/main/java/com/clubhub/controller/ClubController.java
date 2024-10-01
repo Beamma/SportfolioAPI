@@ -91,7 +91,7 @@ public class ClubController {
                                                      HttpServletRequest request) { // TODO Refactor, to use DTOs
         System.out.println("PUT /clubs/{id}/request/{id}");
 
-        ClubUpdateDTO clubUpdateDTO = new ClubUpdateDTO(requestBody.status, clubService.getById(clubId), request.getHeader("Authorization").substring(7));
+        ClubUpdateDTO clubUpdateDTO = new ClubUpdateDTO(requestBody.status, clubService.getById(clubId), request.getHeader("Authorization").substring(7), requestId);
 
         if (!clubService.clubUpdateIsValid(clubUpdateDTO)) {
             return ResponseEntity.status(400).body(clubUpdateDTO.getResponse());
@@ -103,53 +103,12 @@ public class ClubController {
             return ResponseEntity.status(403).body(clubUpdateDTO.getResponse());
         }
 
+        // Update the club request
         if (!clubService.handleUpdateRequest(clubUpdateDTO)) {
             return ResponseEntity.status(400).body(clubUpdateDTO.getResponse());
         }
 
-
-
-        // If accepting a request to join club
-        if (requestedStatus.equals("accepted")) {
-            ClubMembers clubMember = clubService.acceptRequest(requestId);
-            if (clubMember == null) {
-                response.put("requestError", "There Was An Error Processing The Request.");
-                return ResponseEntity.status(400).body(response);
-            }
-
-            // If successfully added member, format response
-            else {
-                response.put("memberId", clubMember.getId());
-                response.put("dateAccepted", clubMember.getDateAccepted());
-                response.put("club", clubMember.getClub().getName());
-                response.put("user", clubMember.getUser().getId());
-                return ResponseEntity.status(200).body(response);
-            }
-        }
-
-        // If removing a user from the club
-        if (requestedStatus.equals("removed")) {
-            if (clubService.denyRequest(requestId) == null) {
-                response.put("requestError", "There Was An Error Processing The Request.");
-                return ResponseEntity.status(400).body(response);
-            }
-        }
-
-        // Otherwise
-        ClubRequests updatedClubRequest = clubService.updateClubRequest(requestId, requestedStatus);
-
-        if (updatedClubRequest == null) {
-            response.put("requestError", "The Request Does Not Exist");
-            return ResponseEntity.status(403).body(response);
-        }
-
-
-        response.put("requestId", updatedClubRequest.getId());
-        response.put("dateResponded", updatedClubRequest.getDateResponded());
-        response.put("club", updatedClubRequest.getClub().getName());
-        response.put("user", updatedClubRequest.getUser().getId());
-        return ResponseEntity.status(200).body(response);
+        // If successful update, return successful response
+        return ResponseEntity.status(200).body(clubUpdateDTO.getResponse());
     }
-
-
 }
