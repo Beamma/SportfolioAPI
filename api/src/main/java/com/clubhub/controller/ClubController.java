@@ -4,9 +4,6 @@ import com.clubhub.dto.ClubRequestDTO;
 import com.clubhub.dto.ClubUpdateDTO;
 import com.clubhub.dto.ClubsDTO;
 import com.clubhub.dto.UpdateClubRequestDTO;
-import com.clubhub.entity.Club;
-import com.clubhub.entity.ClubMembers;
-import com.clubhub.entity.ClubRequests;
 import com.clubhub.service.ClubService;
 import com.clubhub.service.UserService;
 import com.clubhub.validation.ClubFilterValidation;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
