@@ -88,7 +88,7 @@ public class ClubController {
     public ResponseEntity<?> updateRequestToJoinClub(@PathVariable("clubId") Long clubId,
                                                      @PathVariable("requestId") Long requestId,
                                                      @RequestBody UpdateClubRequestDTO requestBody,
-                                                     HttpServletRequest request) { // TODO Refactor, to use DTOs
+                                                     HttpServletRequest request) {
         System.out.println("PUT /clubs/{id}/request/{id}");
 
         ClubUpdateDTO clubUpdateDTO = new ClubUpdateDTO(requestBody.status, clubService.getById(clubId), request.getHeader("Authorization").substring(7), requestId);
