@@ -1,6 +1,10 @@
 package com.clubhub.controller;
 
+import com.clubhub.requestBody.BulkSeason;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * A Controller for handling
@@ -13,6 +17,21 @@ public class PlayerCapsController {
      * Add bulk caps for multiple players with minimal detail
      * [{playerId: x, count: y}, {playerId: x, count: y, season: 2022, competition: 1}] Division should be an ID based off the unions they belong to
      */
+    @PostMapping("/clubs/{clubId}/statistics/season")
+    public ResponseEntity<?> addBulkSeasonCaps(@PathVariable("clubId") Long clubId,
+                                               @RequestBody List<BulkSeason> bulkSeasons) {
+        System.out.println("POST /clubs/{clubId}/statistics/season");
+
+        // Check if valid
+
+        // Check permissions
+
+        // Add to db
+
+        // Return response
+
+        return ResponseEntity.status(200).body("Test");
+    }
 
     /**
      * Add a match
