@@ -1,17 +1,37 @@
 package com.clubhub.controller;
 
-import com.clubhub.requestBody.BulkSeason;
+import com.clubhub.entity.Club;
+import com.clubhub.entity.User;
+import com.clubhub.requestBody.AddBulkSeasonRequest;
+import com.clubhub.service.ClubService;
+import com.clubhub.service.UserService;
+import com.clubhub.validation.GameRecordsValidator;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * A Controller for handling
  */
 @RestController
 @RequestMapping("/api")
-public class PlayerCapsController {
+public class GameRecordsController {
+
+    private final GameRecordsValidator gameRecordsValidator = new GameRecordsValidator();
+
+    private final ClubService clubService;
+
+    private final UserService userService;
+
+    public GameRecordsController(ClubService clubService, UserService userService){
+        this.userService = userService;
+        this.clubService = clubService;
+    }
 
     /**
      * Add bulk caps for multiple players with minimal detail
@@ -19,12 +39,31 @@ public class PlayerCapsController {
      */
     @PostMapping("/clubs/{clubId}/statistics/season")
     public ResponseEntity<?> addBulkSeasonCaps(@PathVariable("clubId") Long clubId,
-                                               @RequestBody List<BulkSeason> bulkSeasons) {
+                                               @RequestBody List<AddBulkSeasonRequest> bulkSeasonsRequest,
+                                               HttpServletRequest request) {
         System.out.println("POST /clubs/{clubId}/statistics/season");
 
-        // Check if valid
+        // Create Response
+        Map<String, Object> response =  new HashMap<>();
+
+        // Check club exists
+        Club club = clubService.getById(clubId);
+        if (club == null) {
+            response.put("error", "Club Not Found");
+            return ResponseEntity.status(404).body(response);
+        }
 
         // Check permissions
+        User user = userService.getCurrentUser(request.getHeader("Authorization").substring(7));
+        if (!(user.getClubMember().getRole().equals("ADMIN") || user.getClubMember().getRole().equals("ROOT"))) {
+            response.put("error", "User Is Not Authorized To Perform That Action");
+            return ResponseEntity.status(403).body(response);
+        }
+
+        // Check if valid
+        if (!gameRecordsValidator.validateAddBulkSeasonRequest(bulkSeasonsRequest, response)) {
+            return ResponseEntity.status(400).body(response);
+        }
 
         // Add to db
 
