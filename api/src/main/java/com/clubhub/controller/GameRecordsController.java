@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * A Controller for handling
+ * A Controller for handling requests to add and update GameRecords
  */
 @RestController
 @RequestMapping("/api")
