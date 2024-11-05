@@ -50,6 +50,10 @@ public class UserService {
         return false;
     }
 
+    public User getById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
     /**
      * Takes a userDTO and creates a user in the database
      * @param userDTO a DTO carrying all the register form data
@@ -93,6 +97,11 @@ public class UserService {
         return userRepository.findByEmail(userEmail);
     }
 
+    /**
+     * Check if the current user is authorized to update requests
+     * @param clubUpdateDTO a DTO to carry all the required information
+     * @return true if successful, false otherwise
+     */
     public boolean userAllowedToUpdateClubRequestStatus(ClubUpdateDTO clubUpdateDTO) {
         User user = getCurrentUser(clubUpdateDTO.getToken());
 

@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * User Season Entity
+ * Stores records for each player for each season
+ */
 @Data
 @NoArgsConstructor
 @Entity
@@ -21,11 +25,19 @@ public class UserSeason {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User playerId;
+    private User player;
 
-    @Column(nullable = false)
+    @Column
     private int season;
 
-    @Column(nullable = false)
-    private int competition;
+    @Column
+    private Long competition;
+
+
+    public UserSeason(int count, User player, int season, Long competition) {
+        this. count = count;
+        this.player = player;
+        this.season = season;
+        this.competition = competition;
+    }
 }

@@ -1,19 +1,18 @@
 package com.clubhub.controller;
 
 import com.clubhub.entity.Club;
+import com.clubhub.entity.Records.UserSeason;
 import com.clubhub.entity.User;
 import com.clubhub.requestBody.AddBulkSeasonRequest;
 import com.clubhub.service.ClubService;
+import com.clubhub.service.UserSeasonService;
 import com.clubhub.service.UserService;
 import com.clubhub.validation.GameRecordsValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A Controller for handling requests to add and update GameRecords
@@ -28,13 +27,17 @@ public class GameRecordsController {
 
     private final UserService userService;
 
-    public GameRecordsController(ClubService clubService, UserService userService){
+    private final UserSeasonService userSeasonService;
+
+    public GameRecordsController(ClubService clubService, UserService userService, UserSeasonService userSeasonService){
         this.userService = userService;
         this.clubService = clubService;
+        this.userSeasonService = userSeasonService;
     }
 
     /**
      * Add bulk caps for multiple players with minimal detail
+     *
      * [{playerId: x, count: y}, {playerId: x, count: y, season: 2022, competition: 1}] Division should be an ID based off the unions they belong to
      */
     @PostMapping("/clubs/{clubId}/statistics/season")
@@ -66,10 +69,19 @@ public class GameRecordsController {
         }
 
         // Add to db
+        List<UserSeason> userSeasons = new ArrayList<>();
+        for (AddBulkSeasonRequest seasonRequest : bulkSeasonsRequest) {
+            User player = userService.getById(seasonRequest.playerId);
+            if (player == null) {
+                response.put("error", "Player Not Found With ID: " + seasonRequest.playerId);
+                return ResponseEntity.status(400).body(response);
+            }
+            UserSeason userSeason = userSeasonService.createUserSeason(seasonRequest, player);
+            userSeasons.add(userSeason);
+        }
 
         // Return response
-
-        return ResponseEntity.status(200).body("Test");
+        return ResponseEntity.status(200).body(userSeasons);
     }
 
     /**

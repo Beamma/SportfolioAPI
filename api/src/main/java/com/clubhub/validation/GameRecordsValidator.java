@@ -1,7 +1,9 @@
 package com.clubhub.validation;
 
 import com.clubhub.requestBody.AddBulkSeasonRequest;
+import com.clubhub.service.UserService;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Year;
 import java.util.List;
@@ -22,7 +24,6 @@ public class GameRecordsValidator {
     private static final String INVALID_COMPETITION_ERROR = "Invalid Season Competition Selection";
 
 
-
     /**
      * Check that the request for bulk adding games is valid
      * @param request object, containing all information from request
@@ -37,8 +38,6 @@ public class GameRecordsValidator {
                 return false;
             }
 
-            // Check playerId is valid
-
             // Check season is between 1850 and current year
             if (!validateSeason(item, response)) {
                 return false;
@@ -49,9 +48,9 @@ public class GameRecordsValidator {
                 return false;
             }
 
-            // Check for duplicates possibly?
+            // Check for duplicates possibly? TODO
 
-            // Possibly have to check that it's not already in db, otherwise prompt them to do a put request?
+            // Possibly have to check that it's not already in db, otherwise prompt them to do a put request? TODO
         }
 
         return true;
