@@ -48,7 +48,7 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user")
     private ClubMembers clubMember;
 
-    @OneToMany(mappedBy = "playerId")
+    @OneToMany(mappedBy = "player")
     private List<UserSeason> userSeasons;
 
     public User(String firstName, String lastName, String email, String password) {

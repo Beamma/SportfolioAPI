@@ -1,9 +1,7 @@
 package com.clubhub.validation;
 
 import com.clubhub.requestBody.AddBulkSeasonRequest;
-import com.clubhub.service.UserService;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Year;
 import java.util.List;
