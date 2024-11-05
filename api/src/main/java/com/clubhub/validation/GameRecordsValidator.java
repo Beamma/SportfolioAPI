@@ -77,7 +77,12 @@ public class GameRecordsValidator {
      * @return true if valid, false if error
      */
     private Boolean validateSeason(AddBulkSeasonRequest request, Map<String, Object> response) {
-        if (request.season > Year.now().getValue() || request.count < MIN_SEASON) {
+
+        if (request.season == null) {
+            return true;
+        }
+
+        if (request.season > Year.now().getValue() || request.season < MIN_SEASON) {
             response.put("seasonError", INVALID_SEASON_ERROR);
             return false;
         }
@@ -92,6 +97,11 @@ public class GameRecordsValidator {
      * @return true if valid, false if error
      */
     private Boolean validateCompetition (AddBulkSeasonRequest request, Map<String, Object> response) { // TODO Needs to be changed when competitions introduced
+
+        if (request.competition == null) {
+            return true;
+        }
+
         if (request.competition <= 0) {
             response.put("competitionError", INVALID_COMPETITION_ERROR);
             return false;

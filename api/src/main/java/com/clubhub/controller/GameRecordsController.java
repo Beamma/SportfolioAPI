@@ -45,6 +45,7 @@ public class GameRecordsController {
                                                @RequestBody List<AddBulkSeasonRequest> bulkSeasonsRequest,
                                                HttpServletRequest request) {
         System.out.println("POST /clubs/{clubId}/statistics/season");
+        System.out.println(bulkSeasonsRequest.get(0).season);
 
         // Create Response
         Map<String, Object> response =  new HashMap<>();

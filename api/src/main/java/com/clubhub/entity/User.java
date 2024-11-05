@@ -1,6 +1,7 @@
 package com.clubhub.entity;
 
 import com.clubhub.entity.Records.UserSeason;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,15 +40,19 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<ClubRequests> clubRequests;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "user")
     private ClubMembers clubMember;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "player")
     private List<UserSeason> userSeasons;
 

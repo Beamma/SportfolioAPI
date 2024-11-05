@@ -28,13 +28,13 @@ public class UserSeason {
     private User player;
 
     @Column
-    private int season;
+    private Long season;
 
     @Column
     private Long competition;
 
 
-    public UserSeason(int count, User player, int season, Long competition) {
+    public UserSeason(int count, User player, Long season, Long competition) {
         this. count = count;
         this.player = player;
         this.season = season;

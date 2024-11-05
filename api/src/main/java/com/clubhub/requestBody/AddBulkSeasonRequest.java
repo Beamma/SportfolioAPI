@@ -10,7 +10,7 @@ public class AddBulkSeasonRequest {
 
     public int count;
 
-    public int season;
+    public Long season;
 
     public Long competition;
 }
