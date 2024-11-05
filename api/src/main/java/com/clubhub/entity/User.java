@@ -1,5 +1,6 @@
 package com.clubhub.entity;
 
+import com.clubhub.entity.Records.UserSeason;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +47,9 @@ public class User implements UserDetails {
 
     @OneToOne(mappedBy = "user")
     private ClubMembers clubMember;
+
+    @OneToMany(mappedBy = "playerId")
+    private List<UserSeason> userSeasons;
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
